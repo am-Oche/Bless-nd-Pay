@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bless nd Pay — Smarter Banking Everyday</title>
+<meta name="description" content="Pay, send, track and control your money and cards in one place. Software demo." />
+<link rel="stylesheet" href="bp/styles.css" />
+<style>
+  body { background: #f7f9fc; overflow-x: hidden; }
+  @keyframes maskUp { from { transform: translateY(105%); } to { transform: none; } }
+  @keyframes phoneIn { from { opacity: 0; transform: translateY(80px) scale(.94); } to { opacity: 1; transform: none; } }
+  @keyframes screenIn { from { opacity: 0; transform: translateX(24px) scale(.98); } to { opacity: 1; transform: none; } }
+  .m-tile { transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
+  .m-tile:hover { transform: translateY(-6px); box-shadow: var(--shadow-2); }
+  .m-mob { display: none !important; }
+  @media (max-width: 860px) {
+    .m-desk { display: none !important; }
+    .m-mob { display: inline-grid !important; }
+    .m-2col { grid-template-columns: 1fr !important; }
+    .m-2col > * { justify-self: start !important; }
+  }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Bless nd Pay","applicationCategory":"FinanceApplication","operatingSystem":"Web"}
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="bp/data.js"></script>
+<script type="text/babel" src="bp/ui.jsx"></script>
+<script type="text/babel" src="bp/app-core.jsx"></script>
+<script type="text/babel" src="bp/screens-a.jsx"></script>
+<script type="text/babel" src="bp/screens-b.jsx"></script>
+<script type="text/babel" src="bp/app.jsx"></script>
+<script type="text/babel" src="bp/marketing.jsx"></script>
+<script type="text/babel">
+ReactDOM.createRoot(document.getElementById('root')).render(<Marketing />);
+</script>
+</body>
+</html>

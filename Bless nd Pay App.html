@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Bless nd Pay — App (demo)</title>
+<link rel="stylesheet" href="bp/styles.css" />
+<style>
+  html, body, #root { height: 100%; }
+  body { background: #e9edf3; overflow: hidden; }
+  .bnp-stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  .bnp-frame { position: relative; overflow: hidden; transition: width .5s var(--ease), height .5s var(--ease), border-radius .5s var(--ease), box-shadow .5s; background: #fff; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="bp/data.js"></script>
+<script type="text/babel" src="bp/ui.jsx"></script>
+<script type="text/babel" src="bp/app-core.jsx"></script>
+<script type="text/babel" src="bp/screens-a.jsx"></script>
+<script type="text/babel" src="bp/screens-b.jsx"></script>
+<script type="text/babel" src="bp/app.jsx"></script>
+<script type="text/babel" src="tweaks_panel.jsx"></script>
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "preview": "auto",
+  "currency": "NGN",
+  "theme": "light",
+  "demoBadge": true
+}/*EDITMODE-END*/;
+
+const FRAMES = {
+  auto: null,
+  mobile: { w: 390, h: 844, r: 44 },
+  tablet: { w: 900, h: 680, r: 28 },
+  desktop: { w: 1440, h: 900, r: 16 },
+};
+
+function Root() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [vp, setVp] = React.useState({ w: innerWidth, h: innerHeight });
+  React.useEffect(() => { const r = () => setVp({ w: innerWidth, h: innerHeight }); addEventListener('resize', r); return () => removeEventListener('resize', r); }, []);
+  window.BP.brand.showDemoBadge = t.demoBadge;
+  // push currency + theme into app store via localStorage-backed state
+  const appKey = 'bnp-app-v1';
+  const [nonce, setNonce] = React.useState(0);
+  React.useEffect(() => {
+    try { const s = JSON.parse(localStorage.getItem(appKey) || '{}'); s.cur = t.currency; s.theme = t.theme; localStorage.setItem(appKey, JSON.stringify(s)); } catch (e) {}
+    setNonce(n => n + 1);
+  }, [t.currency, t.theme]);
+
+  const f = FRAMES[t.preview];
+  let style = { width: '100%', height: '100%' };
+  if (f) {
+    const k = Math.min(1, (vp.w - 40) / f.w, (vp.h - 40) / f.h);
+    style = { width: f.w, height: f.h, borderRadius: f.r, boxShadow: '0 30px 80px -20px rgba(20,32,70,.35)', transform: `scale(${k})`, transformOrigin: 'center' };
+  }
+  return (
+    <div className="bnp-stage">
+      <div className="bnp-frame" style={style}>
+        <BPApp key={nonce + t.preview} persistKey={appKey} force={f ? (t.preview) : null} phone={t.preview === 'mobile'} />
+      </div>
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Preview layout">
+          <TweakSelect label="Viewport" value={t.preview} onChange={v => setTweak('preview', v)} options={[{ value: 'auto', label: 'Auto (your window)' }, { value: 'mobile', label: 'Mobile · 390' }, { value: 'tablet', label: 'Tablet · 900' }, { value: 'desktop', label: 'Desktop · 1440' }]} />
+        </TweakSection>
+        <TweakSection label="Display">
+          <TweakRadio label="Currency" value={t.currency} onChange={v => setTweak('currency', v)} options={['NGN', 'USD']} />
+          <TweakRadio label="Theme" value={t.theme} onChange={v => setTweak('theme', v)} options={['light', 'dark']} />
+          <TweakToggle label="Demo badge" value={t.demoBadge} onChange={v => setTweak('demoBadge', v)} />
+        </TweakSection>
+        <TweakSection label="Reset">
+          <TweakButton label="Reset demo data" onClick={() => { localStorage.removeItem(appKey); setNonce(n => n + 1); }} />
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+</script>
+</body>
+</html>
